@@ -1,82 +1,60 @@
-import React, { useState } from "react";
-import { Container, Typography, TextField, Button, Link } from "@mui/material";
-import "../../index.css";
+import { Stack, Typography } from '@mui/material'
 
-const RegisterPage = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+import { Form } from 'components'
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    console.log("Email:", email);
-    console.log("Password:", password);
-    // Lógica adicional...
-  };
+import { fields, schema } from './form-data'
 
-  const handleRegistroClick = () => {
-    // Aquí puedes agregar lógica para redirigir a la página de registro
-    console.log("Redirigiendo a la página de registro");
-    // Lógica adicional...
-  };
+import { useState } from 'react'
+
+import { register } from 'services/auth-service'
+
+import { toast } from 'react-toastify'
+
+import { useAuth } from 'hooks'
+
+import { useNavigate } from 'react-router-dom'
+
+function RegisterPage() {
+  const navigate = useNavigate()
+  const [, dispatch] = useAuth()
+  const [errorsFromResponse, setErrorsFromResponse] = useState([])
+
+  const onSubmit = user => {
+    register(user)
+      .then(decodedJWT => {
+        const { username, isAdmin } = decodedJWT
+
+        const type = isAdmin ? 'admin' : 'login'
+
+        dispatch({ type, username })
+        navigate('/', {})
+      })
+      .catch(err => {
+        const { data, status } = err.response
+
+        if (Array.isArray(data) && status === 400) {
+          setErrorsFromResponse(err.response.data)
+        } else {
+          toast.error(data.message)
+        }
+      })
+  }
 
   return (
-    <Container component="main" maxWidth="xs">
-      <div className="main-container">
-        <Typography variant="h1" style={{ fontSize: "6rem" }}>
-          Futbotiesos
-        </Typography>
-        <Typography variant="h6" gutterBottom>
-          Únete a la comunidad de futbolistas amateur más grande del país
-        </Typography>
+    <Stack spacing={3}>
+      <Typography variant="h2" component="h2">
+        Registrar Usuario{' '}
+      </Typography>
 
-        <form onSubmit={handleSubmit}>
-          <TextField
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            id="nombre"
-            label="Nombre y apellidos"
-            name="nombre"
-            autoComplete="Nombre y apellidos"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
+      <Form
+        inputs={fields}
+        onSubmit={onSubmit}
+        validationSchema={schema}
+        errorsFromResponse={errorsFromResponse}
+        submitLabel="Registrar"
+      />
+    </Stack>
+  )
+}
 
-          <TextField
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            name="email"
-            label="Email"
-            type="email"
-            id="email"
-            autoComplete="email"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-
-          <TextField
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            name="new password"
-            label="Nuevo Password"
-            type="password"
-            id="password"
-            autoComplete="new-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <Button type="submit" fullWidth variant="contained" color="primary">
-            Enviar
-          </Button>
-        </form>
-      </div>
-    </Container>
-  );
-};
-
-export default RegisterPage;
+export default RegisterPage

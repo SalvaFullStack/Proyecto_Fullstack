@@ -1,12 +1,12 @@
-import React from "react";
-import ReactDOM from "react-dom";
-import App from "./App.jsx";
-import MainPage from "./pages/LoginPage/index.jsx";
-import "./index.css";
+import ReactDOM from "react-dom/client";
+
+import "./bootstrap.js";
+
+import RouterProvider from "./router";
+import { AuthProvider } from "hooks";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
-    <App />
-    <MainPage />
-  </React.StrictMode>
+  <AuthProvider>
+    <RouterProvider />
+  </AuthProvider>
 );

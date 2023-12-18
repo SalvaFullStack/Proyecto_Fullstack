@@ -1,77 +1,60 @@
-import React, { useState } from "react";
-import { Container, Typography, TextField, Button, Link } from "@mui/material";
-import "../../index.css";
+import { Stack, Typography } from '@mui/material'
 
-const MainPage = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+import { Form } from 'components'
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    console.log("Email:", email);
-    console.log("Password:", password);
-    // Lógica adicional...
-  };
+import { fields, schema } from './form-data'
 
-  const handleRegistroClick = () => {
-    // Aquí puedes agregar lógica para redirigir a la página de registro
-    console.log("Redirigiendo a la página de registro");
-    // Lógica adicional...
-  };
+import { useState } from 'react'
+
+import { login } from 'services/auth-service'
+
+import { toast } from 'react-toastify'
+
+import { useAuth } from 'hooks'
+
+import { useNavigate } from 'react-router-dom'
+
+function LoginPage() {
+  const navigate = useNavigate()
+  const [, dispatch] = useAuth()
+  const [errorsFromResponse, setErrorsFromResponse] = useState([])
+
+  const onSubmit = user => {
+    login(user)
+      .then(decodedJWT => {
+        const { username, isAdmin } = decodedJWT
+
+        const type = isAdmin ? 'admin' : 'login'
+
+        dispatch({ type, username })
+        navigate('/', {})
+      })
+      .catch(err => {
+        const { data, status } = err.response
+
+        if (Array.isArray(data) && status === 400) {
+          setErrorsFromResponse(err.response.data)
+        } else {
+          toast.error(data.message)
+        }
+      })
+  }
 
   return (
-    <Container component="main" maxWidth="xs">
-      <div className="main-container">
-        <Typography variant="h1" style={{ fontSize: "6rem" }}>
-          Futbotiesos
-        </Typography>
-        <Typography variant="h6" gutterBottom>
-          Únete a la comunidad de futbolistas amateur más grande del país
-        </Typography>
+    <Stack spacing={3}>
+      <Typography variant="h2" component="h2">
+        Acceso Usuario{' '}
+      </Typography>
 
-        <form onSubmit={handleSubmit}>
-          <TextField
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            id="email"
-            label="Email"
-            name="email"
-            autoComplete="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
+      <Form
+        inputs={fields}
+        onSubmit={onSubmit}
+        validationSchema={schema}
+        errorsFromResponse={errorsFromResponse}
+        submitLabel="Entrar"
+      />
+    </Stack>
+  )
+}
 
-          <TextField
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            name="password"
-            label="Password"
-            type="password"
-            id="password"
-            autoComplete="current-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-
-          <Button type="submit" fullWidth variant="contained" color="primary">
-            Enviar
-          </Button>
-        </form>
-
-        {/* Enlace para registrarse */}
-        <Typography variant="body2" className="registration-link">
-          ¿Nuevo por aquí y quieres dar lecciones de fútbol?{" "}
-          <Link onClick={handleRegistroClick} style={{ cursor: "pointer" }}>
-            Regístrate aquí
-          </Link>
-        </Typography>
-      </div>
-    </Container>
-  );
-};
-
-export default MainPage;
+export default LoginPage
