@@ -5,8 +5,11 @@ import {
 
 import RootLayout from "layouts/RootLayout";
 import ErrorPage from "pages/ErrorPage";
-import CreateTeam from "./pages/CreateTeam";
+import DashboardAdmin from "./pages/DashboardAdmin";
+import CreateMatchdayPage from "./pages/CreateMatchDayPage";
+
 import MatchDayPage from "./pages/MatchDayPage";
+import TeamListPage from "./pages/TeamListPage";
 import ProfilePage from "./pages/ProfilePage";
 import AddPlayersPage from "./pages/AddPlayersPage";
 import LoginPage from "./pages/LoginPage";
@@ -27,21 +30,29 @@ const router = createBrowserRouter([
         element: <ProtectedRoute page={WorkdaysPage} role="anonymous" />,
       },
       {
+        path: "/matchdaycreate",
+        element: <ProtectedRoute page={CreateMatchdayPage} role="anonymous" />,
+      },
+      {
         path: "/matchday",
         element: <ProtectedRoute page={MatchDayPage} role="anonymous" />,
+      },
+      {
+        path: "/dashboard",
+        element: <ProtectedRoute page={DashboardAdmin} role="anonymous" />,
       },
       {
         path: "/profile",
         element: <ProtectedRoute page={ProfilePage} role="anonymous" />,
       },
-      {
-        path: "/team/new",
-        element: <ProtectedRoute page={CreateTeam} role="anonymous" />,
-      },
 
       {
         path: "/team/addplayer",
         element: <ProtectedRoute page={AddPlayersPage} role="anonymous" />,
+      },
+      {
+        path: "/team/list",
+        element: <ProtectedRoute page={TeamListPage} role="anonymous" />,
       },
       {
         path: "/login",

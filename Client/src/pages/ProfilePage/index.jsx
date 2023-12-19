@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Container, Typography, Button, Grid, Paper } from "@mui/material";
+import { Link } from "react-router-dom";
 
 const ProfilePage = () => {
   const [userData, setUserData] = useState({});
@@ -18,12 +19,6 @@ const ProfilePage = () => {
         setLoading(false); // Manejar el error y marcar la carga como completa
       });
   }, []);
-
-  const handleJornadasClick = () => {
-    if (loading) {
-      return <p>Cargando...</p>;
-    }
-  };
 
   // Muestra un mensaje de carga mientras se obtiene la información del usuario
   if (loading) {
@@ -54,7 +49,8 @@ const ProfilePage = () => {
       <Button
         variant="contained"
         color="primary"
-        onClick={handleJornadasClick}
+        component={Link}
+        to="/matchday"
         style={{ position: "absolute", top: 100, right: 50 }}
       >
         Jornadas

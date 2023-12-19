@@ -63,6 +63,10 @@ const TeamCreationPage = () => {
   };
 
   const handleSaveTeam = () => {
+    if (selectedPlayers.length < 7) {
+      console.error("Debe seleccionar al menos siete jugadores.");
+      return;
+    }
     // Lógica para guardar el equipo en el backend
     axios
       .post("http://localhost:3000/api/teams", {
@@ -85,13 +89,13 @@ const TeamCreationPage = () => {
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             Crear Equipo
           </Typography>
-          <Button color="inherit" component={Link} to="/teams">
+          <Button color="inherit" component={Link} to="/team/list">
             Lista de Equipos
           </Button>
           <Button color="inherit" component={Link} to="/matchday">
             Ver Jornada
           </Button>
-          <Button color="inherit" component={Link} to="/create-matchday">
+          <Button color="inherit" component={Link} to="/matchdaycreate">
             Crear Jornada
           </Button>
         </Toolbar>
@@ -143,9 +147,6 @@ const TeamCreationPage = () => {
                 </ListItem>
               ))}
             </List>
-            <Button variant="contained" color="primary" fullWidth>
-              Añadir Jugador
-            </Button>
           </Paper>
         </Grid>
         <Grid item xs={6}>
@@ -171,21 +172,17 @@ const TeamCreationPage = () => {
                 </ListItem>
               ))}
             </List>
-            <Button variant="contained" color="primary" fullWidth>
-              Quitar Jugador
-            </Button>
           </Paper>
         </Grid>
       </Grid>
 
       <Button
         type="button"
-        fullWidth
         variant="contained"
         color="primary"
         onClick={handleSaveTeam}
-        disabled={!teamName || selectedPlayers.length === 0}
-        sx={{ marginTop: 2 }}
+        disabled={!teamName || selectedPlayers.length < 7}
+        sx={{ position: "absolute", top: 100, right: 30, marginTop: 2 }}
       >
         Guardar Equipo
       </Button>
