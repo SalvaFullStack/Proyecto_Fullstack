@@ -1,15 +1,40 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { Container, Typography, Button, Grid, Paper } from "@mui/material";
+import apiClient from "src/services/api-client";
+import {
+  Container,
+  Typography,
+  Button,
+  Grid,
+  Paper,
+  useTheme,
+} from "@mui/material";
 import { Link } from "react-router-dom";
+import { CleaningServices } from "@mui/icons-material";
+import { styled } from "@mui/system";
+
+const StyledContainer = styled(Container)({
+  marginTop: "2rem",
+});
+
+const StyledPaper = styled(Paper)({
+  padding: "1rem",
+  textAlign: "center",
+  color: "inherit", // Use "inherit" to match the text color to the theme
+});
+
+const StyledButton = styled(Button)({
+  marginTop: "1rem",
+  width: "100%", // Ancho del 100% del contenedor padre
+});
 
 const ProfilePage = () => {
   const [userData, setUserData] = useState({});
   const [loading, setLoading] = useState(true);
+  const theme = useTheme();
 
   useEffect(() => {
-    axios
-      .get(`http://localhost:3000/api/users/user/657865a6b86d5c3e8847a72a`)
+    apiClient
+      .get(`/users/profile`)
       .then(({ data }) => {
         setUserData(data);
         setLoading(false);
@@ -26,36 +51,40 @@ const ProfilePage = () => {
   }
 
   return (
-    <Container component="main" maxWidth="xs">
+    <StyledContainer>
       <Grid container spacing={2}>
         {/* Equipo */}
-        <Grid item xs={6}>
-          <Paper>
+        <Grid item xs={12} md={6}>
+          <StyledPaper>
             <Typography variant="h6">Equipo:</Typography>
             <Typography variant="subtitle1">
               {userData.team ? userData.team.name : "No asignado"}
             </Typography>
-          </Paper>
+          </StyledPaper>
         </Grid>
         {/* Posición */}
-        <Grid item xs={6}>
-          <Paper>
+        <Grid item xs={12} md={6}>
+          <StyledPaper>
             <Typography variant="h6">Posición:</Typography>
             <Typography variant="subtitle1">{userData.position}</Typography>
-          </Paper>
+          </StyledPaper>
+        </Grid>
+        {/* Botón Jornadas */}
+        <Grid item xs={12}>
+          <StyledButton
+            variant="contained"
+            sx={{
+              backgroundColor: "#25273a",
+              color: theme.palette.common.white,
+            }}
+            component={Link}
+            to="/matchday"
+          >
+            Ir a Jornadas
+          </StyledButton>
         </Grid>
       </Grid>
-      {/* Botón Jornadas */}
-      <Button
-        variant="contained"
-        color="primary"
-        component={Link}
-        to="/matchday"
-        style={{ position: "absolute", top: 100, right: 50 }}
-      >
-        Jornadas
-      </Button>
-    </Container>
+    </StyledContainer>
   );
 };
 

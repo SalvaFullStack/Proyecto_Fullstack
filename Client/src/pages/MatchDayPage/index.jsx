@@ -1,123 +1,124 @@
-import React from "react";
-import { styled } from "@mui/system";
+import React, { useState, useEffect } from "react";
+import { Link, useParams } from "react-router-dom";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Button,
   Container,
+  Typography,
+  Grid,
+  Paper,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
-import { Link } from "react-router-dom";
-import CreateIcon from "@mui/icons-material/Create";
+import Button from "@mui/material/Button";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import axios from "axios";
 
-const MatchTable = styled(Table)({
-  minWidth: 650,
-  "& th, td": {
-    textAlign: "center",
-    padding: "8px",
-  },
-});
+const ViewMatchdayPage = () => {
+  const { matchdayId } = useParams();
+  const [matchday, setMatchday] = useState({ matches: [] });
+  const [teams, setTeams] = useState([]);
 
-const StyledContainer = styled(Container)({
-  position: "relative",
-});
+  useEffect(() => {
+    const fetchMatchday = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:3000/api/matchday/${matchdayId}`
+        );
+        setMatchday(response.data);
+      } catch (error) {
+        console.error("Error fetching matchday:", error);
+      }
+    };
 
-const StyledButton = styled(Button)({
-  position: "absolute",
-  top: "-20px",
-  right: "-100px",
-});
+    const fetchTeams = async () => {
+      try {
+        const response = await axios.get("http://localhost:3000/api/teams");
+        setTeams(response.data);
+      } catch (error) {
+        console.error("Error fetching teams:", error);
+      }
+    };
 
-const BackButton = styled(Button)({
-  position: "absolute",
-  top: "-25px",
-  left: "-95px",
-});
-
-const handleSaveButtonClick = async () => {
-  // Lógica para guardar la jornada
-  const newMatchday = {
-    // Detalles de la jornada (equipo local, goles, equipo visitante, etc.)
-  };
-
-  try {
-    // Realiza una solicitud POST al backend para guardar la jornada
-    const response = await axios.post(
-      "http://localhost:3000/api/matchdays",
-      newMatchday
-    );
-    console.log("Jornada guardada:", response.data);
-  } catch (error) {
-    console.error("Error al guardar la jornada:", error);
-  }
-};
-
-const MatchdayPage = () => {
-  const matches = [
-    { homeTeam: "Equipo A", awayTeam: "Equipo B", homeGoals: 2, awayGoals: 1 },
-    { homeTeam: "Equipo C", awayTeam: "Equipo D", homeGoals: 0, awayGoals: 0 },
-    { homeTeam: "Equipo E", awayTeam: "Equipo F", homeGoals: 3, awayGoals: 2 },
-    { homeTeam: "Equipo G", awayTeam: "Equipo H", homeGoals: 1, awayGoals: 1 },
-  ];
-
-  const handleBackButtonClick = async () => {
-    // Lógica para consultar jornadas anteriores
-    try {
-      // Realiza una solicitud GET al backend para obtener todas las jornadas
-      const response = await axios.get("http://localhost:3000/api/matchdays");
-      console.log("Jornadas anteriores:", response.data);
-      // Aquí puedes actualizar el estado de tu componente con las jornadas anteriores y mostrarlas
-    } catch (error) {
-      console.error("Error al obtener las jornadas anteriores:", error);
-    }
-  };
+    fetchMatchday();
+    fetchTeams();
+  }, [matchdayId]);
 
   return (
-    <StyledContainer>
-      <TableContainer component={Paper}>
-        <MatchTable>
-          <TableHead>
-            <TableRow>
-              <TableCell>Equipo Local</TableCell>
-              <TableCell>Goles</TableCell>
-              <TableCell>Goles</TableCell>
-              <TableCell>Equipo Visitante</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {matches.map((match, index) => (
-              <TableRow key={index}>
-                <TableCell>{match.homeTeam}</TableCell>
-                <TableCell>{match.homeGoals}</TableCell>
-                <TableCell>{match.awayGoals}</TableCell>
-                <TableCell>{match.awayTeam}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </MatchTable>
-      </TableContainer>
-      <StyledButton
+    <Container component="main" maxWidth="md">
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          marginBottom: "20px",
+        }}
+      >
+        <Typography variant="h4" style={{ textAlign: "center" }}>
+          Ver Jornada
+        </Typography>
+      </div>
+
+      <Grid container spacing={2}>
+        {matchday.matches.map((match, index) => (
+          <Grid container item key={index} justifyContent="space-between">
+            <Grid item xs={5}>
+              <Paper style={{ padding: "10px" }}>
+                <FormControl fullWidth>
+                  <InputLabel id={`team-label-${index}-0`}>
+                    Equipo Local
+                  </InputLabel>
+                  <Select
+                    labelId={`team-label-${index}-0`}
+                    value={match.homeTeam}
+                    label="Equipo Local"
+                    disabled
+                  >
+                    {teams.map((team) => (
+                      <MenuItem key={team._id} value={team._id}>
+                        {team.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Paper>
+            </Grid>
+            <Grid item xs={5}>
+              <Paper style={{ padding: "10px" }}>
+                <FormControl fullWidth>
+                  <InputLabel id={`team-label-${index}-1`}>
+                    Equipo Visitante
+                  </InputLabel>
+                  <Select
+                    labelId={`team-label-${index}-1`}
+                    value={match.awayTeam}
+                    label="Equipo Visitante"
+                    disabled
+                  >
+                    {teams.map((team) => (
+                      <MenuItem key={team._id} value={team._id}>
+                        {team.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Paper>
+            </Grid>
+          </Grid>
+        ))}
+      </Grid>
+
+      <Button
         component={Link}
-        to={"/profile"}
+        to="/matchday"
         color="primary"
         variant="contained"
-        startIcon={<CreateIcon />}
+        startIcon={<ArrowBackIcon />}
+        style={{ marginTop: "20px" }}
       >
-        Perfil usuario
-      </StyledButton>
-      <BackButton
-        onClick={handleBackButtonClick}
-        color="secondary"
-        variant="contained"
-      >
-        Jornadas anteriores
-      </BackButton>
-    </StyledContainer>
+        Perfil
+      </Button>
+    </Container>
   );
 };
 
-export default MatchdayPage;
+export default ViewMatchdayPage;

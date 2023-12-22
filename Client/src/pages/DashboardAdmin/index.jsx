@@ -1,8 +1,9 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Button, Container, Typography } from "@mui/material";
+import { Button, Container, Typography, useTheme } from "@mui/material";
 
 const AdminDashboard = () => {
+  const theme = useTheme();
   return (
     <Container component="main" maxWidth="xs">
       <Typography
@@ -14,7 +15,10 @@ const AdminDashboard = () => {
 
       <Button
         variant="contained"
-        color="primary"
+        sx={{
+          backgroundColor: "#c7ceea",
+          color: theme.palette.common.white,
+        }}
         fullWidth
         style={{ margin: "10px 0" }}
         component={Link}
@@ -25,7 +29,10 @@ const AdminDashboard = () => {
 
       <Button
         variant="contained"
-        color="primary"
+        sx={{
+          backgroundColor: "#b05f5f",
+          color: theme.palette.common.white,
+        }}
         fullWidth
         style={{ margin: "10px 0" }}
         component={Link}
@@ -36,7 +43,10 @@ const AdminDashboard = () => {
 
       <Button
         variant="contained"
-        color="primary"
+        sx={{
+          backgroundColor: "#a48e00",
+          color: theme.palette.common.white,
+        }}
         fullWidth
         style={{ margin: "10px 0" }}
         component={Link}
@@ -47,7 +57,10 @@ const AdminDashboard = () => {
 
       <Button
         variant="contained"
-        color="primary"
+        sx={{
+          backgroundColor: "#415cbd",
+          color: theme.palette.common.white,
+        }}
         fullWidth
         style={{ margin: "10px 0" }}
         component={Link}

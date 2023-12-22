@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
+
+import apiClient from "src/services/api-client";
 import {
   Container,
   Typography,
@@ -8,17 +9,20 @@ import {
   ListItem,
   ListItemText,
   Button,
+  useTheme,
 } from "@mui/material";
-import CreateIcon from "@mui/icons-material/Create";
+import DeleteIcon from "@mui/icons-material/Delete";
+import BorderColorIcon from "@mui/icons-material/BorderColor";
 
 const TeamListPage = () => {
   const [teams, setTeams] = useState([]);
   const isMounted = useRef(true);
+  const theme = useTheme();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/api/teams");
+        const response = await apiClient.get("/teams");
         if (isMounted.current) {
           setTeams(response.data);
         }
@@ -30,23 +34,17 @@ const TeamListPage = () => {
     fetchData();
 
     return () => {
-      // Cleanup function to prevent state updates on unmounted component
       isMounted.current = false;
     };
   }, []);
 
   const handleDeleteTeam = async (teamId) => {
     try {
-      // Realizar la solicitud de borrado
-      await axios.delete(`http://localhost:3000/api/teams/${teamId}`);
+      await apiClient.delete(`/teams/${teamId}`);
 
-      // Actualizar la lista de equipos después del borrado
       setTeams((prevTeams) => prevTeams.filter((team) => team._id !== teamId));
-
-      // Opcional: Puedes agregar una notificación de éxito aquí si lo deseas
     } catch (error) {
       console.error("Error al borrar el equipo:", error);
-      // Opcional: Puedes agregar una notificación de error aquí si lo deseas
     }
   };
 
@@ -55,55 +53,79 @@ const TeamListPage = () => {
       <div
         style={{
           display: "flex",
-          justifyContent: "space-between",
+          justifyContent: "flex-end",
           marginBottom: "20px",
         }}
       >
-        <Typography variant="h4" style={{ textAlign: "center" }}>
-          Lista de Equipos
-        </Typography>
-        <div>
-          <Button
-            component={Link}
-            to="/team/addplayer"
-            color="primary"
-            variant="contained"
-            style={{ marginRight: "10px" }}
-          >
-            Crear equipo
-          </Button>
-          <Button
-            component={Link}
-            to="/matchdaycreate"
-            color="primary"
-            variant="contained"
-            style={{ marginRight: "10px" }}
-          >
-            Crear jornada
-          </Button>
-          <Button
-            component={Link}
-            to="/matchday"
-            color="primary"
-            variant="contained"
-          >
-            Ver jornada
-          </Button>
-        </div>
+        <Button
+          component={Link}
+          to="/team/addplayer"
+          sx={{
+            backgroundColor: "#415cbd",
+            color: theme.palette.common.white,
+          }}
+          variant="contained"
+          size="small"
+          style={{ marginRight: "10px" }}
+        >
+          Crear equipo
+        </Button>
+        <Button
+          component={Link}
+          to="/matchdaycreate"
+          color="primary"
+          sx={{
+            backgroundColor: "#a48e00",
+            color: theme.palette.common.white,
+          }}
+          variant="contained"
+          size="small"
+          style={{ marginRight: "10px" }}
+        >
+          Crear jornada
+        </Button>
+        <Button
+          component={Link}
+          to="/matchday"
+          sx={{
+            backgroundColor: "#424459",
+            color: theme.palette.common.white,
+          }}
+          variant="contained"
+          size="small"
+        >
+          Ver jornada
+        </Button>
       </div>
 
       <List>
+        <Typography>
+          <h1>EQUIPOS</h1>
+        </Typography>
         {teams.map((team) => (
           <ListItem key={team._id}>
             <ListItemText primary={team.name} />
             <Button
-              onClick={() => handleDeleteTeam(team._id)}
-              color="primary"
+              sx={{
+                backgroundColor: "#c7ceea",
+                color: theme.palette.common.black,
+              }}
               variant="contained"
-              startIcon={<CreateIcon />}
-            >
-              Borrar Equipo
-            </Button>
+              size="small"
+              component={Link}
+              to={`/team/${team._id}`}
+              startIcon={<BorderColorIcon />}
+            ></Button>
+            <Button
+              onClick={() => handleDeleteTeam(team._id)}
+              sx={{
+                backgroundColor: "#25273a",
+                color: theme.palette.common.white,
+              }}
+              variant="contained"
+              size="small"
+              startIcon={<DeleteIcon />}
+            ></Button>
           </ListItem>
         ))}
       </List>

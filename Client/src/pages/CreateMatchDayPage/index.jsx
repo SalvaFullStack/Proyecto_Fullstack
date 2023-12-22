@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
+
 import {
   Container,
   Typography,
@@ -14,44 +14,79 @@ import {
   MenuItem,
   Input,
   InputAdornment,
+  useTheme,
 } from "@mui/material";
 import SaveIcon from "@mui/icons-material/Save";
+import { toast } from "react-toastify";
+import apiClient from "src/services/api-client";
+
+import { useForm } from "react-hook-form";
 
 const CreateMatchdayPage = () => {
   const [teams, setTeams] = useState([]);
   const [selectedTeams, setSelectedTeams] = useState([]);
+  const [matchday, setMatchday] = useState({});
   const [matchdayResults, setMatchdayResults] = useState(Array(8).fill(""));
+  const theme = useTheme();
+
+  const { register, handleSubmit } = useForm();
 
   useEffect(() => {
-    // Obtener la lista de equipos al cargar la página
-    axios
-      .get("http://localhost:3000/api/teams")
+    apiClient
+      .get("/teams")
       .then((response) => {
         setTeams(response.data);
       })
       .catch((error) => {
         console.error("Error fetching teams:", error);
       });
+
+    apiClient.get("/matchday/last").then(({ data }) => {
+      if (!data.current) return;
+
+      setMatchday(data);
+    });
   }, []);
 
   const handleTeamChange = (index, teamId) => {
-    // Actualizar el equipo seleccionado en el estado
+    const existingTeam = selectedTeams.find(
+      (selectedTeam) => selectedTeam === teamId
+    );
+
+    if (existingTeam) {
+      toast.error("Los equipos no pueden jugar contra sí mismos");
+
+      return;
+    }
+
     const updatedTeams = [...selectedTeams];
     updatedTeams[index] = teamId;
     setSelectedTeams(updatedTeams);
   };
 
   const handleResultChange = (index, value) => {
-    // Actualizar el resultado ingresado en el estado
     const updatedResults = [...matchdayResults];
     updatedResults[index] = value;
     setMatchdayResults(updatedResults);
   };
 
-  const handleSaveMatchday = () => {
-    // Lógica para guardar la jornada
-    console.log("Equipos seleccionados:", selectedTeams);
-    console.log("Resultados:", matchdayResults);
+  const handleSaveMatchday = async () => {
+    const matchdayData = {
+      matches: selectedTeams.map((teamId, index) => ({
+        homeTeam: teamId,
+        awayTeam: selectedTeams[(index + 1) % selectedTeams.length],
+        result: matchdayResults[index],
+      })),
+    };
+
+    try {
+      const response = await apiClient.post("/matchday", matchdayData);
+      console.log("Jornada guardada:", response.data);
+      toast.success("Jornada guardada exitosamente");
+    } catch (error) {
+      console.error("Error al guardar la jornada:", error);
+      toast.error("Error al guardar la jornada");
+    }
   };
 
   return (
@@ -70,8 +105,12 @@ const CreateMatchdayPage = () => {
           <Button
             component={Link}
             to="/team/addplayer"
-            color="primary"
+            sx={{
+              backgroundColor: "#415cbd",
+              color: theme.palette.common.white,
+            }}
             variant="contained"
+            size="small"
             style={{ marginRight: "10px" }}
           >
             Crear equipo
@@ -79,7 +118,11 @@ const CreateMatchdayPage = () => {
           <Button
             component={Link}
             to="/team/list"
-            color="primary"
+            sx={{
+              backgroundColor: "#a48e00",
+              color: theme.palette.common.white,
+            }}
+            size="small"
             variant="contained"
             style={{ marginRight: "10px" }}
           >
@@ -88,8 +131,12 @@ const CreateMatchdayPage = () => {
           <Button
             component={Link}
             to="/matchday"
-            color="primary"
+            sx={{
+              backgroundColor: "#424459",
+              color: theme.palette.common.white,
+            }}
             variant="contained"
+            size="small"
           >
             Ver jornada
           </Button>

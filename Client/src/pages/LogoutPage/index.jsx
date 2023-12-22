@@ -1,21 +1,21 @@
-import { logout } from 'services/auth-service'
+import { logout } from "services/auth-service";
 
-import { useAuth } from 'hooks'
+import { useAuth } from "hooks";
 
-import { useNavigate } from 'react-router-dom'
-import { useEffect } from 'react'
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 function LogoutPage() {
-  const navigate = useNavigate()
-  const [, dispatch] = useAuth()
+  const navigate = useNavigate();
+  const [, dispatch] = useAuth();
 
   useEffect(() => {
-    logout()
-    dispatch({ type: 'logout' })
-    navigate('/login')
-  }, [])
+    logout();
+    dispatch({ type: "logout" });
+    navigate("/login", { replace: true });
+  }, []);
 
-  return false
+  return false;
 }
 
-export default LogoutPage
+export default LogoutPage;

@@ -20,18 +20,16 @@ function RegisterPage() {
   const [errorsFromResponse, setErrorsFromResponse] = useState([]);
 
   const onSubmit = (user) => {
+    console.log(user);
     register(user)
       .then((decodedJWT) => {
         const { username, isAdmin } = decodedJWT;
-
         const type = isAdmin ? "admin" : "login";
-
         dispatch({ type, username });
-        navigate("/", {});
+        navigate("/", { replace: true });
       })
       .catch((err) => {
         const { data, status } = err.response;
-
         if (Array.isArray(data) && status === 400) {
           setErrorsFromResponse(err.response.data);
         } else {

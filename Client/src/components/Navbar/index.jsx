@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState } from "react";
 
 import {
   AppBar,
@@ -9,42 +9,53 @@ import {
   Avatar,
   Button,
   Tooltip,
-} from '@mui/material'
+  useTheme,
+} from "@mui/material";
 
-import MenuIcon from '@mui/icons-material/Menu'
+import MenuIcon from "@mui/icons-material/Menu";
 
-import { useAuth } from 'hooks'
+import { useAuth } from "hooks";
 
-import { stringAvatar } from './helpers'
+import { stringAvatar } from "./helpers";
 
-import Brand from './Brand'
-import { Menu, CollapseMenu } from '../../components'
-function Navbar() {
-  const [user] = useAuth()
-  const [anchorElNav, setAnchorElNav] = useState(null)
-  const [anchorElUser, setAnchorElUser] = useState(null)
+import Brand from "./Brand";
+import { Menu, CollapseMenu } from "../../components";
 
-  const handleOpenNavMenu = event => setAnchorElNav(event.currentTarget)
-  const handleOpenUserMenu = event => setAnchorElUser(event.currentTarget)
+function Navbar({ children }) {
+  const theme = useTheme();
+  const [user] = useAuth();
+  const [anchorElNav, setAnchorElNav] = useState(null);
+  const [anchorElUser, setAnchorElUser] = useState(null);
 
-  const optionsMainMenu = /* user.admin ? */ [
-    { label: 'Customers', to: '/' },
-  ] /* : [] */
+  const handleOpenNavMenu = (event) => setAnchorElNav(event.currentTarget);
+  const handleOpenUserMenu = (event) => setAnchorElUser(event.currentTarget);
+
+  const optionsMainMenu = !user.auth
+    ? []
+    : user.admin
+    ? [{ label: "Equipos", to: "/team/list" }]
+    : [{ label: "Equipos", to: "/team/list" }];
 
   const optionsUserMenu = user.auth
-    ? [{ label: 'Logout', to: '/logout' }]
+    ? [{ label: "Logout", to: "/logout" }]
     : [
-        { label: 'Login', to: '/login' },
-        { label: 'Register', to: '/register' },
-      ]
+        { label: "Login", to: "/login" },
+        { label: "Register", to: "/register" },
+      ];
 
   return (
-    <AppBar position="static" color="primary">
+    <AppBar
+      position="static"
+      sx={{
+        backgroundColor: theme.palette.error.main,
+        color: theme.palette.common.white,
+      }}
+    >
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <Brand />
 
-          <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
+          <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
             <IconButton
               size="large"
               onClick={handleOpenNavMenu}
@@ -70,8 +81,8 @@ function Navbar() {
                 <Avatar
                   {...stringAvatar(
                     !user.auth
-                      ? 'John Doe'
-                      : user.username.toUpperCase() + ' ' + 'V'
+                      ? "John Doe"
+                      : user.username.toUpperCase() + " " + "V"
                   )}
                 />
               </IconButton>
@@ -85,6 +96,6 @@ function Navbar() {
         </Toolbar>
       </Container>
     </AppBar>
-  )
+  );
 }
-export default Navbar
+export default Navbar;

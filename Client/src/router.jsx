@@ -1,6 +1,7 @@
 import {
   createBrowserRouter,
   RouterProvider as RouterProviderRRD,
+  Navigate,
 } from "react-router-dom";
 
 import RootLayout from "layouts/RootLayout";
@@ -16,8 +17,7 @@ import LoginPage from "./pages/LoginPage";
 import LogoutPage from "./pages/LogoutPage";
 import RegisterPage from "./pages/RegisterPage";
 import ProtectedRoute from "./utils/ProtectedRoute";
-
-const WorkdaysPage = () => <h1>workdays</h1>;
+import TeamDetailPage from "./pages/TeamDetailPage";
 
 const router = createBrowserRouter([
   {
@@ -27,32 +27,40 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <ProtectedRoute page={WorkdaysPage} role="anonymous" />,
+        element: <Navigate to="/login" replace={true} />,
       },
       {
         path: "/matchdaycreate",
-        element: <ProtectedRoute page={CreateMatchdayPage} role="anonymous" />,
+        element: <ProtectedRoute page={CreateMatchdayPage} role="admin" />,
       },
       {
         path: "/matchday",
-        element: <ProtectedRoute page={MatchDayPage} role="anonymous" />,
+        element: <ProtectedRoute page={MatchDayPage} role="auth" />,
+      },
+      {
+        path: "/matchday/:matchdayId",
+        element: <ProtectedRoute page={MatchDayPage} role="auth" />,
       },
       {
         path: "/dashboard",
-        element: <ProtectedRoute page={DashboardAdmin} role="anonymous" />,
+        element: <ProtectedRoute page={DashboardAdmin} role="admin" />,
       },
       {
         path: "/profile",
-        element: <ProtectedRoute page={ProfilePage} role="anonymous" />,
+        element: <ProtectedRoute page={ProfilePage} role="auth" />,
       },
 
       {
         path: "/team/addplayer",
-        element: <ProtectedRoute page={AddPlayersPage} role="anonymous" />,
+        element: <ProtectedRoute page={AddPlayersPage} role="admin" />,
+      },
+      {
+        path: "/team/:teamId",
+        element: <ProtectedRoute page={TeamDetailPage} role="admin" />,
       },
       {
         path: "/team/list",
-        element: <ProtectedRoute page={TeamListPage} role="anonymous" />,
+        element: <ProtectedRoute page={TeamListPage} role="admin" />,
       },
       {
         path: "/login",

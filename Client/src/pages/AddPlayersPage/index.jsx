@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import apiClient from "src/services/api-client";
+
 import {
   Container,
   Typography,
@@ -12,8 +13,12 @@ import {
   Paper,
   AppBar,
   Toolbar,
+  useTheme,
 } from "@mui/material";
 import { Link } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const TeamCreationPage = () => {
   const [teamName, setTeamName] = useState("");
@@ -21,10 +26,10 @@ const TeamCreationPage = () => {
   const [selectedPlayers, setSelectedPlayers] = useState([]);
   const [positionFilter, setPositionFilter] = useState("");
   const [filteredPlayers, setFilteredPlayers] = useState([]);
+  const theme = useTheme();
 
   useEffect(() => {
-    // Obtener la lista completa de jugadores al cargar la página
-    axios.get("http://localhost:3000/api/users").then((response) => {
+    apiClient.get("/users").then((response) => {
       setAllPlayers(response.data);
       setFilteredPlayers(response.data);
     });
@@ -47,18 +52,16 @@ const TeamCreationPage = () => {
   };
 
   const handleAddPlayer = (player) => {
-    // Añadir jugador a la lista del equipo
     setSelectedPlayers([...selectedPlayers, player]);
-    // Filtrar jugador de la lista general
+
     const filtered = filteredPlayers.filter((p) => p._id !== player._id);
     setFilteredPlayers(filtered);
   };
 
   const handleRemovePlayer = (player) => {
-    // Quitar jugador de la lista del equipo
     const updatedPlayers = selectedPlayers.filter((p) => p._id !== player._id);
     setSelectedPlayers(updatedPlayers);
-    // Agregar jugador de nuevo a la lista general
+
     setFilteredPlayers([...filteredPlayers, player]);
   };
 
@@ -67,42 +70,63 @@ const TeamCreationPage = () => {
       console.error("Debe seleccionar al menos siete jugadores.");
       return;
     }
-    // Lógica para guardar el equipo en el backend
-    axios
-      .post("http://localhost:3000/api/teams", {
+
+    apiClient
+      .post("/teams", {
         name: teamName,
         players: selectedPlayers.map((player) => player._id),
       })
       .then((response) => {
-        console.log("Equipo creado:", response.data);
-        // Puedes redirigir o hacer otras acciones después de crear el equipo
+        toast.success("¡Equipo creado!");
       })
       .catch((error) => {
-        console.error("Error al crear el equipo:", error);
+        toast.error("Error al crear el equipo:");
       });
   };
 
   return (
     <Container component="main" maxWidth="md">
-      <AppBar position="static">
-        <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Crear Equipo
-          </Typography>
-          <Button color="inherit" component={Link} to="/team/list">
-            Lista de Equipos
-          </Button>
-          <Button color="inherit" component={Link} to="/matchday">
-            Ver Jornada
-          </Button>
-          <Button color="inherit" component={Link} to="/matchdaycreate">
-            Crear Jornada
-          </Button>
-        </Toolbar>
-      </AppBar>
+      <Toolbar>
+        <Button
+          sx={{
+            backgroundColor: "#415cbd",
+            color: theme.palette.common.white,
+          }}
+          size="small"
+          style={{ marginRight: "10px" }}
+          component={Link}
+          to="/team/list"
+        >
+          Lista de Equipos
+        </Button>
+        <Button
+          sx={{
+            backgroundColor: "#a48e00",
+            color: theme.palette.common.white,
+          }}
+          size="small"
+          style={{ marginRight: "10px" }}
+          component={Link}
+          to="/matchday"
+        >
+          Ver Jornada
+        </Button>
+        <Button
+          sx={{
+            backgroundColor: "#424459",
+            color: theme.palette.common.white,
+          }}
+          size="small"
+          style={{ marginRight: "10px" }}
+          component={Link}
+          to="/matchdaycreate"
+        >
+          Crear Jornada
+        </Button>
+      </Toolbar>
 
       <Typography variant="h5" align="center" gutterBottom>
-        Nuevo Equipo: {teamName}
+        CREAR NUEVO EQUIPO: {teamName}
       </Typography>
 
       <TextField
@@ -139,8 +163,12 @@ const TeamCreationPage = () => {
                   />
                   <Button
                     variant="contained"
-                    color="primary"
+                    sx={{
+                      backgroundColor: "#c7ceea",
+                      color: theme.palette.common.black,
+                    }}
                     onClick={() => handleAddPlayer(player)}
+                    size="small"
                   >
                     Añadir
                   </Button>
@@ -164,11 +192,13 @@ const TeamCreationPage = () => {
                   />
                   <Button
                     variant="contained"
-                    color="secondary"
+                    sx={{
+                      backgroundColor: "#25273a",
+                      color: theme.palette.common.white,
+                    }}
                     onClick={() => handleRemovePlayer(player)}
-                  >
-                    Quitar
-                  </Button>
+                    startIcon={<DeleteIcon />}
+                  ></Button>
                 </ListItem>
               ))}
             </List>
@@ -186,6 +216,7 @@ const TeamCreationPage = () => {
       >
         Guardar Equipo
       </Button>
+      <ToastContainer />
     </Container>
   );
 };
